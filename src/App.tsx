@@ -10,6 +10,7 @@ interface Ball {
     x: number;
     y: number;
   };
+  isColorPickerOpen: boolean;
 }
 
 const BilliardsTable: React.FC = () => {
@@ -20,6 +21,7 @@ const BilliardsTable: React.FC = () => {
   const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [selectedBall, setSelectedBall] = useState<Ball | null>(null);
   const [ballColors] = useState<string[]>(['red', 'green', 'blue', 'yellow', 'orange']);
+  const [ballRadiuses] = useState<number[]>([15, 20, 25, 30]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -70,9 +72,8 @@ const BilliardsTable: React.FC = () => {
 
     const handleDoubleClick = () => {
       if (selectedBall) {
-        const newColor = ballColors[Math.floor(Math.random() * ballColors.length)];
-        selectedBall.color = newColor;
-        setBalls([...balls.filter(ball => ball.id !== selectedBall.id), selectedBall]);
+        selectedBall.isColorPickerOpen = true;
+        setBalls([...balls]);
       }
     };
 
@@ -140,6 +141,10 @@ const BilliardsTable: React.FC = () => {
         ctx.fillStyle = ball.color;
         ctx.fill();
         ctx.closePath();
+
+        if (ball.isColorPickerOpen) {
+          drawColorPicker(ctx, ball);
+        }
       }
 
       requestAnimationFrame(animate);
@@ -152,10 +157,9 @@ const BilliardsTable: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const radius = 20;
     const startX = canvas.width / 2;
     const startY = canvas.height - 50;
-    const yOffset = Math.sqrt(3) * radius;
+    const yOffset = Math.sqrt(3) * ballRadiuses[ballRadiuses.length - 1];
     const numLayers = 5;
 
     const newBalls: Ball[] = [];
@@ -164,11 +168,12 @@ const BilliardsTable: React.FC = () => {
       for (let j = 0; j <= i; j++) {
         const ball: Ball = {
           id: newBalls.length + 1,
-          x: startX - i * radius + j * radius * 2,
+          x: startX - i * ballRadiuses[j] + j * ballRadiuses[ballRadiuses.length - 1] * 2,
           y: startY - i * yOffset,
-          radius,
+          radius: ballRadiuses[j],
           color: ballColors[Math.floor(Math.random() * ballColors.length)],
           velocity: { x: 0, y: 0 },
+          isColorPickerOpen: false,
         };
 
         newBalls.push(ball);
@@ -179,30 +184,63 @@ const BilliardsTable: React.FC = () => {
   };
 
   const changeColor = (color: string) => {
-    if (!selectedBall) return;
-    selectedBall.color = color;
-    setSelectedBall({ ...selectedBall });
+    if (!selectedBall
+      ) return;
+      selectedBall.color = color;
+      selectedBall.isColorPickerOpen = false;
+      setSelectedBall({ ...selectedBall });
+    };
+  
+    // Функция отрисовки выпадающего списка выбора цвета
+    const drawColorPicker = (ctx: CanvasRenderingContext2D, ball: Ball) => {
+      const dropdownWidth = 100;
+      const dropdownHeight = 50;
+      const dropdownX = ball.x - dropdownWidth / 2;
+      const dropdownY = ball.y - ball.radius - dropdownHeight;
+  
+      ctx.beginPath();
+      ctx.rect(dropdownX, dropdownY, dropdownWidth, dropdownHeight);
+      ctx.fillStyle = '#f1f1f1';
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#000000';
+      ctx.stroke();
+      ctx.closePath();
+  
+      ctx.font = '12px Arial';
+      ctx.fillStyle = '#000000';
+      ctx.fillText('Select Color', dropdownX + 10, dropdownY + 20);
+  
+      const colorY = dropdownY + 30;
+      ballColors.forEach((color, index) => {
+        ctx.beginPath();
+        ctx.rect(dropdownX + 10 + index * 20, colorY, 20, 20);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.closePath();
+      });
+    };
+  
+    return (
+      <div className="billiards-container"
+        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: '10px' }}
+      >
+        <canvas ref={canvasRef} width={800} height={500} style={{ border: '2px solid black', marginBottom: '10px' }} />
+        <button onClick={startGame}>Start Game</button>
+        {selectedBall && (
+          <div className="color-menu">
+          <span>Select Color: </span>
+          {ballColors.map((color, index) => (
+          <button key={index} style={{ backgroundColor: color }} onClick={() => changeColor(color)} />
+        ))}
+      </div>
+    )}
+  </div>
+  );
   };
-
-  return (
-    <div className="billiards-container"
-      style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', paddingTop: '10px' }}
-    >
-      <canvas ref={canvasRef} width={800} height={500} style={{ border: '2px solid black', marginBottom: '10px' }} />
-      <button onClick={startGame}>Start Game</button>
-      {selectedBall && (
-        <div className="color-menu">
-        <span>Select Color: </span>
-        {ballColors.map((color, index) => (
-        <button key={index} style={{ backgroundColor: color }} onClick={() => changeColor(color)} />
-      ))}
-    </div>
-  )}
-</div>
-);
-};
-
-export default BilliardsTable;
+  
+  export default BilliardsTable;
+  
 
 
 
