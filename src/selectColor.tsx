@@ -10,7 +10,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ onSelectColor }) => {
   const handleColorSelect = (color: string) => {
     onSelectColor(color);
   };
-
+// 
   return (
     <div className="color-picker">
       <span>Select Color: </span>
