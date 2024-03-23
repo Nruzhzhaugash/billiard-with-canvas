@@ -88,7 +88,7 @@ const BilliardsTable: React.FC = () => {
       canvas.removeEventListener('mouseup', handleMouseUp);
       canvas.removeEventListener('dblclick', handleDoubleClick);
     };
-  }, [balls, isMoving, mousePosition, startPosition, selectedBall, ballColors]);
+  }, [balls, isMoving, mousePosition, startPosition, selectedBall]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -184,14 +184,12 @@ const BilliardsTable: React.FC = () => {
   };
 
   const changeColor = (color: string) => {
-    if (!selectedBall
-      ) return;
-      selectedBall.color = color;
+    if (!selectedBall) return;
+      selectedBall.color = color
       selectedBall.isColorPickerOpen = false;
-      setSelectedBall({ ...selectedBall });
+      setBalls([...balls]); 
     };
   
-    // Функция отрисовки выпадающего списка выбора цвета
     const drawColorPicker = (ctx: CanvasRenderingContext2D, ball: Ball) => {
       const dropdownWidth = 100;
       const dropdownHeight = 50;
@@ -225,23 +223,19 @@ const BilliardsTable: React.FC = () => {
       <div className="billiards-container"
         style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: '10px' }}
       >
-        <canvas ref={canvasRef} width={800} height={500} style={{ border: '2px solid black', marginBottom: '10px' }} />
+        <canvas ref={canvasRef} width={900} height={400} style={{ border: '2px solid black', marginBottom: '10px' }} />
+        <h1>Нужно зажать на шар и перетащить вниз мышку, если хотите поменять цвет заливки шара</h1>
         <button onClick={startGame}>Start Game</button>
         {selectedBall && (
           <div className="color-menu">
-          <span>Select Color: </span>
-          {ballColors.map((color, index) => (
-          <button key={index} style={{ backgroundColor: color }} onClick={() => changeColor(color)} />
-        ))}
+            <span>Select Color: </span>
+            {ballColors.map((color, index) => (
+              <button key={index} style={{ backgroundColor: color }} onClick={() => changeColor(color)} />
+            ))}
+          </div>
+        )}
       </div>
-    )}
-  </div>
-  );
-  };
-  
-  export default BilliardsTable;
-  
+    );
+};
 
-
-
-
+export default BilliardsTable;
