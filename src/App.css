@@ -1,0 +1,11 @@
+.billiards-container canvas {
+  /* position: absolute; */
+  top: 0;
+  left: 0;
+}
+
+.ball {
+  animation: collision-animation 0.1s ease-in-out;
+}
+
+@keyframes
