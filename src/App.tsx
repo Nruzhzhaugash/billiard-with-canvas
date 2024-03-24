@@ -152,7 +152,7 @@ const BilliardsTable: React.FC = () => {
       id: index + 1,
       x: position.x,
       y: position.y,
-      radius: 20,
+      radius: index % 2 === 0 ? 15 : 20,
       color: 'black',
       velocity: { x: 0, y: 0 }
     }));
@@ -168,12 +168,12 @@ const BilliardsTable: React.FC = () => {
   };
 
   return (
-    <div className="billiards-container">
+    <div className="billiards-container" style={{ marginTop: '10px' }}>
       <canvas
         ref={canvasRef}
-        width={800}
+        width={900}
         height={400}
-        style={{ border: '1px solid black', cursor: isDragging ? 'grabbing' : 'grab' }}
+        style={{ border: '1px solid black', cursor: isDragging ? 'grabbing' : 'grab', marginRight: '10px'  }}
       />
       <button onClick={startGame}>Start Game</button>
       {isColorPickerVisible && (
