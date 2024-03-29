@@ -52,8 +52,11 @@ const BilliardsTable: React.FC = () => {
       if (!isDragging || !selectedBall) return;
 
       const rect = canvas.getBoundingClientRect();
-      const mouseX = event.clientX - rect.left;
-      const mouseY = event.clientY - rect.top;
+      let mouseX = event.clientX - rect.left;
+      let mouseY = event.clientY - rect.top;
+
+      mouseX = Math.min(canvas.width, Math.max(0, mouseX));
+      mouseY = Math.min(canvas.height, Math.max(0, mouseY));
 
       const dx = mouseX - mousePosition.x;
       const dy = mouseY - mousePosition.y;
@@ -72,13 +75,19 @@ const BilliardsTable: React.FC = () => {
       }
     };
 
+    const handleMouseOut = () => {
+      setIsDragging(false);
+    };
+
     canvas.addEventListener('mousedown', handleMouseDown);
     canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mouseout', handleMouseOut);
     canvas.addEventListener('mouseup', handleMouseUp);
 
     return () => {
       canvas.removeEventListener('mousedown', handleMouseDown);
       canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('mouseout', handleMouseOut);
       canvas.removeEventListener('mouseup', handleMouseUp);
     };
   }, [balls, isDragging, mousePosition, selectedBall]);
